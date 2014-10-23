@@ -133,7 +133,7 @@ final class RequestBuilder implements RequestInterceptor.RequestFacade {
           }
       }
   }
-  
+
   @Override public void addPathParam(String name, String value) {
     addPathParam(name, value, true);
   }
