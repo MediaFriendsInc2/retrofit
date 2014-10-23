@@ -34,6 +34,7 @@ import retrofit.http.EncodedQuery;
 import retrofit.http.EncodedQueryMap;
 import retrofit.http.Field;
 import retrofit.http.FieldMap;
+import retrofit.http.HeaderMap;
 import retrofit.http.Part;
 import retrofit.http.PartMap;
 import retrofit.http.Path;
@@ -119,6 +120,20 @@ final class RequestBuilder implements RequestInterceptor.RequestFacade {
     headers.add(new Header(name, value));
   }
 
+  private void addHeaderMap(int parameterNumber, Map<?, ?> map) {
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+          Object entryKey = entry.getKey();
+          if (entryKey == null) {
+              throw new IllegalArgumentException(
+                      "Parameter #" + (parameterNumber + 1) + " header map contained null key.");
+          }
+          Object entryValue = entry.getValue();
+          if (entryValue != null) { // Skip null values.
+              addHeader(entryKey.toString(), entryValue.toString());
+          }
+      }
+  }
+  
   @Override public void addPathParam(String name, String value) {
     addPathParam(name, value, true);
   }
@@ -274,6 +289,11 @@ final class RequestBuilder implements RequestInterceptor.RequestFacade {
           String name = ((retrofit.http.Header) annotation).value();
           addHeader(name, value.toString());
         }
+      } else if (annotationType == HeaderMap.class) {
+          if (value != null) { // Skip null values.
+              HeaderMap queryMap = (HeaderMap) annotation;
+              addHeaderMap(i, (Map<?, ?>) value);
+          }
       } else if (annotationType == Field.class) {
         String name = ((Field) annotation).value();
         if (value != null) { // Skip null values.

@@ -36,6 +36,7 @@ import retrofit.http.Field;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.Header;
+import retrofit.http.HeaderMap;
 import retrofit.http.Headers;
 import retrofit.http.Multipart;
 import retrofit.http.Part;
@@ -351,6 +352,11 @@ final class RestMethodInfo {
 
           } else if (methodAnnotationType == Header.class) {
             // Nothing to do.
+          } else if (methodAnnotationType == HeaderMap.class) {
+              if (!Map.class.isAssignableFrom(methodParameterType)) {
+                  throw parameterError(i, "@HeaderMap parameter type must be Map.");
+              }
+
           } else if (methodAnnotationType == Field.class) {
             if (requestType != RequestType.FORM_URL_ENCODED) {
               throw parameterError(i, "@Field parameters can only be used with form encoding.");
